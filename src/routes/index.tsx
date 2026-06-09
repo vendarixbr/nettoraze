@@ -74,18 +74,21 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
 
 function useReveal() {
   useEffect(() => {
+    // CSS Scroll-Driven Animations handle everything in modern browsers — skip JS
+    if (typeof CSS !== "undefined" && CSS.supports("animation-timeline", "view()")) return;
+
+    // Fallback for Safari / older browsers
     const els = Array.from(document.querySelectorAll<Element>(".reveal"));
     const vh = window.innerHeight;
 
-    // Mark elements already in viewport as visible BEFORE enabling animation system
-    // This prevents in-view elements from ever flashing invisible
+    // Mark in-viewport elements visible BEFORE activating the hide-CSS
     els.forEach((el) => {
-      if (el.getBoundingClientRect().top < vh) {
+      if (el.getBoundingClientRect().top < vh * 0.95) {
         el.classList.add("is-visible");
       }
     });
 
-    // Now enable the CSS animation system (only affects off-screen elements)
+    // Enable CSS rule that hides off-screen elements
     document.documentElement.classList.add("js-ready");
 
     const obs = new IntersectionObserver(
