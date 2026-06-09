@@ -74,7 +74,20 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
 
 function useReveal() {
   useEffect(() => {
-    const els = document.querySelectorAll(".reveal");
+    const els = Array.from(document.querySelectorAll<Element>(".reveal"));
+    const vh = window.innerHeight;
+
+    // Mark elements already in viewport as visible BEFORE enabling animation system
+    // This prevents in-view elements from ever flashing invisible
+    els.forEach((el) => {
+      if (el.getBoundingClientRect().top < vh) {
+        el.classList.add("is-visible");
+      }
+    });
+
+    // Now enable the CSS animation system (only affects off-screen elements)
+    document.documentElement.classList.add("js-ready");
+
     const obs = new IntersectionObserver(
       (entries) => {
         entries.forEach((e) => {
@@ -84,9 +97,13 @@ function useReveal() {
           }
         });
       },
-      { threshold: 0.12 },
+      { threshold: 0 },
     );
-    els.forEach((el) => obs.observe(el));
+
+    els
+      .filter((el) => !el.classList.contains("is-visible"))
+      .forEach((el) => obs.observe(el));
+
     return () => obs.disconnect();
   }, []);
 }

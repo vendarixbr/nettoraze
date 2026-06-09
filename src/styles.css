@@ -146,9 +146,13 @@
 }
 
 @utility reveal {
+  transition: opacity 0.9s ease, transform 0.9s ease;
+}
+
+/* Only hide elements when JS is running — no-JS fallback keeps everything visible */
+.js-ready .reveal:not(.is-visible) {
   opacity: 0;
   transform: translateY(28px);
-  transition: opacity 0.9s ease, transform 0.9s ease;
 }
 
 .is-visible {
