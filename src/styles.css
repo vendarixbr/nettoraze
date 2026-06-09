@@ -151,7 +151,7 @@
 }
 
 @utility reveal {
-  /* visible by default — no-JS fallback */
+  opacity: 1;
 }
 
 @supports (animation-timeline: view()) {
