@@ -73,35 +73,7 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
 }
 
 function useReveal() {
-  useEffect(() => {
-    const vh = window.innerHeight;
-    const els = Array.from(document.querySelectorAll<Element>(".reveal"));
-
-    // Only hide elements that are below the fold — in-viewport elements are never hidden
-    els.forEach((el) => {
-      if (el.getBoundingClientRect().top > vh * 0.95) {
-        el.classList.add("reveal-hidden");
-      }
-    });
-
-    const obs = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((e) => {
-          if (e.isIntersecting) {
-            e.target.classList.remove("reveal-hidden");
-            obs.unobserve(e.target);
-          }
-        });
-      },
-      { threshold: 0, rootMargin: "0px 0px -40px 0px" },
-    );
-
-    els
-      .filter((el) => el.classList.contains("reveal-hidden"))
-      .forEach((el) => obs.observe(el));
-
-    return () => obs.disconnect();
-  }, []);
+  // Animation handled by CSS scroll-driven animations (no JS needed)
 }
 
 function Landing() {
