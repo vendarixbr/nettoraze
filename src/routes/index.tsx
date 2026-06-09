@@ -74,37 +74,30 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
 
 function useReveal() {
   useEffect(() => {
-    // CSS Scroll-Driven Animations handle everything in modern browsers — skip JS
-    if (typeof CSS !== "undefined" && CSS.supports("animation-timeline", "view()")) return;
-
-    // Fallback for Safari / older browsers
-    const els = Array.from(document.querySelectorAll<Element>(".reveal"));
     const vh = window.innerHeight;
+    const els = Array.from(document.querySelectorAll<Element>(".reveal"));
 
-    // Mark in-viewport elements visible BEFORE activating the hide-CSS
+    // Only hide elements that are below the fold — in-viewport elements are never hidden
     els.forEach((el) => {
-      if (el.getBoundingClientRect().top < vh * 0.95) {
-        el.classList.add("is-visible");
+      if (el.getBoundingClientRect().top > vh * 0.95) {
+        el.classList.add("reveal-hidden");
       }
     });
-
-    // Enable CSS rule that hides off-screen elements
-    document.documentElement.classList.add("js-ready");
 
     const obs = new IntersectionObserver(
       (entries) => {
         entries.forEach((e) => {
           if (e.isIntersecting) {
-            e.target.classList.add("is-visible");
+            e.target.classList.remove("reveal-hidden");
             obs.unobserve(e.target);
           }
         });
       },
-      { threshold: 0 },
+      { threshold: 0, rootMargin: "0px 0px -40px 0px" },
     );
 
     els
-      .filter((el) => !el.classList.contains("is-visible"))
+      .filter((el) => el.classList.contains("reveal-hidden"))
       .forEach((el) => obs.observe(el));
 
     return () => obs.disconnect();
